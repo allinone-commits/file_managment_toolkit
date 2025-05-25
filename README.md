@@ -11,7 +11,7 @@ The All-in-One File Management Toolkit is a desktop application designed to help
 3. Install the required packages with "pip install -r requirements.txt".
 4. Run the application using "python toolkit.py".
 5. Follow on-screen instructions to use the toolkit features.
-6. if any thing proplem please contact as at try96646@gmail.com
+6. If you encounter any issues, please contact us at try96646@gmail.com.”
 
 ### Main Features
 
