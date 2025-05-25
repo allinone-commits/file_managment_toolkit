@@ -1,3 +1,4 @@
+# Some comment
 # All-in-One File Management Toolkit
 
 ### Project Description
