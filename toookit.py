@@ -1,3 +1,4 @@
+#important modules
 import os
 import hashlib
 import shutil
@@ -7,15 +8,25 @@ import bcrypt
 
 # === Feature 1: Batch Rename Files in a Folder ===
 def batch_rename_in_folder(folder, prefix):
-    files = [os.path.join(folder, item) for item in os.listdir(folder) if os.path.isfile(os.path.join(folder, item))]
+    files = [] 
+    for item in os.listdir(folder):  
+    full_path = os.path.join(folder, item) 
+    if os.path.isfile(full_path):  
+        files.append(full_path)
     
     for number, full_file_path in enumerate(files, 1):
+
         folder_of_file, original_file_name = os.path.split(full_file_path)
+
         file_extension = os.path.splitext(original_file_name)[1]
+
         new_file_name = f"{prefix}_{number}{file_extension}"
+
         new_full_path = os.path.join(folder_of_file, new_file_name)
+
         os.rename(full_file_path, new_full_path)
-        print(f"Renamed: {original_file_name} -> {new_file_name}")
+
+        print(f"Renamed😎😎😎: {original_file_name} -> {new_file_name}")
 
 # === Feature 2: Organize Files by Type ===
 def organize_files_by_type(folder_path):
@@ -44,23 +55,34 @@ def organize_files_by_type(folder_path):
     }
 
     for file_name in os.listdir(folder_path):
-        full_path = os.path.join(folder_path, file_name)
-        if os.path.isfile(full_path):
-            ext = os.path.splitext(file_name)[1][1:].lower()
-            ext = ext if ext else "no_extension"
-            folder_name = file_type_folders.get(ext, "Other Files")
-            target_folder = os.path.join(folder_path, folder_name)
-            os.makedirs(target_folder, exist_ok=True)
-            shutil.move(full_path, os.path.join(target_folder, file_name))
 
-    print("Files organized successfully.")
+        full_path = os.path.join(folder_path, file_name)
+
+        if os.path.isfile(full_path):
+            split_name_ext = os.path.splitext(file_name)
+            extension_with_dot = split_name_ext[1]
+
+            ext = extension_with_dot[1:].lower()
+            if not ext:
+                ext = "no_extension"
+            
+            folder_name = file_type_folders.get(ext, "Other Files")
+
+            target_folder = os.path.join(folder_path, folder_name)
+
+            os.makedirs(target_folder, exist_ok=True)
+
+            new_location_file = os.path.join(target_folder, file_name)
+            shutil.move(full_path, new_location)
+
+    print("Files organized successfully.😊😊😊")
 # === Feature 3: Convert File Extensions ===
 def convert_files(folder_path, choice=None):
     if choice is None:
         print("Choose an option:")
-        print("1. Convert images to a single PDF")
-        print("2. Convert documents (doc, docx) to individual PDFs")
-        choice = input("Enter 1 or 2: ").strip()
+        print("1. ------📒Convert images to a single PDF📒")
+        print("2.-------📒 Convert documents (doc, docx) to individual PDFs📒")
+        choice = input("Enter 1 or 2:>>>>> ").strip()
 
     if not os.path.isdir(folder_path):
         print(" Invalid folder path.")
@@ -68,60 +90,96 @@ def convert_files(folder_path, choice=None):
 
     if choice == '1':
         supported_exts = ('.png', '.jpg', '.jpeg')
-        image_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.lower().endswith(supported_exts)]
+        image_files = []
+         for f in os.listdir(folder_path):
+            if f.lower().endswith(supported_exts):
+                image_files.append(os.path.join(folder_path, f))
         image_files.sort()
         if not image_files:
             print("No images found.")
             return
-        images = [Image.open(f).convert("RGB") for f in image_files]
+        images=[]
+        for img_path in image_files:
+        img = Image.open(img_path)
+        rgb_img = img.convert("RGB")
+        images.append(rgb_img)
+
         output_pdf = os.path.join(folder_path, "combined_images.pdf")
-        images[0].save(output_pdf, save_all=True, append_images=images[1:])
-        print(f"Combined images into PDF: {output_pdf}")
+        first_image=images[0]:
+        Other_image=images[1:]
+        first_image.save(
+            output_pdf,          # File path to save the PDF
+            save_all=True,       # Save all images, not just the first
+            append_images=other_images  # Add the other images as extra pages
+            )
+        print(f"😎😎😎cmbined images into PDF: {output_pdf}")
 
     elif choice == '2':
         supported_exts = ('.doc', '.docx')
-        doc_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.lower().endswith(supported_exts)]
+        output_folder = os.path.join(folder_path, "Converted_PDFs")
+        os.makedirs(output_folder, exist_ok=True)
+        doc_files = []
+        for f in os.listdir(folder_path):
+            filename_lower = f.lower()
+        if filename_lower.endswith(supported_exts):
+                # Create the full path of the file and add it to the list
+                full_path = os.path.join(folder_path, f)
+                doc_files.append(full_path)
         if not doc_files:
             print("No documents found.")
             return
-        output_folder = os.path.join(folder_path, "Converted_PDFs")
-        os.makedirs(output_folder, exist_ok=True)
+
         for doc in doc_files:
             name = os.path.splitext(os.path.basename(doc))[0]
             output_pdf = os.path.join(output_folder, f"{name}.pdf")
             convert(doc, output_pdf)
-            print(f"Converted: {doc} -> {output_pdf}")
+            print(f"😎😎😎Converted: {doc} -> {output_pdf}")
     else:
-        print("Invalid choice.")
+        print("⚠️Invalid choice.")
 
 # === Feature 4: Detect and Handle Duplicate Files ===
 def handle_duplicates(folder):
     duplicates_folder = os.path.join(folder, "duplicates")
-    os.makedirs(duplicates_folder, exist_ok=True)
-    files_checked = []
-    duplicates = []
-
-    for filename in os.listdir(folder):
+    os.makedirs(duplicates_folder, exist_ok=True)  
+    duplicates = []     
+    for filename in os.listdir(folder):   
         file_path = os.path.join(folder, filename)
-        if os.path.isfile(file_path):
+
+        if os.path.isfile(file_path):     
             with open(file_path, "rb") as f:
-                content = f.read()
-            if any(content == saved for saved, _ in files_checked):
-                shutil.move(file_path, os.path.join(duplicates_folder, os.path.basename(file_path)))
-                print(f"Moved duplicate: {file_path}")
-            else:
-                files_checked.append((content, file_path))etect and Handle Duplicate Files ===
+                content = f.read()         
+
+          
+            duplicate_found = False
+            for saved_content, saved_path in files_checked:
+                if content == saved_content:
+                    duplicates.append(file_path)   
+                    duplicate_found = True
+                    break                         
+
+            if not duplicate_found:
+                files_checked.append((content, file_path))  
+    if not duplicates:
+        print("No duplicate files found.")
+        return
+    for full_path in duplicates:
+        dest_path = os.path.join(duplicates_folder, os.path.basename(full_path))
+        shutil.move(full_path, dest_path)
+        print("duplicate file moved to duplicated folder 😊😊😊")
 # === Feature 5: Encrypt a File (XOR Encryption) ===
 def encrypt_file(file_path, password):
-    key = ord(password[0])
     with open(file_path, "rb") as f:
         data = f.read()
-    encrypted = bytearray([b ^ key for b in data])
+    encrypted = bytearray() 
+    key = ord(password[0])
+    for b in data:                         
+    encrypted_byte = b ^ key             
+    encrypted.append(encrypted_byte)
     enc_path = file_path + ".enc"
     with open(enc_path, "wb") as f:
         f.write(encrypted)
     os.remove(file_path)
-    print(f"Encrypted and removed original: {file_path}")
+    print(f"🔒Encrypted and removed original: {file_path}")
 
 # === Feature 6: Decrypt a File (XOR Decryption) ===
 def decrypt_file(file_path, password):
@@ -130,61 +188,62 @@ def decrypt_file(file_path, password):
     key = ord(password[0])
     with open(file_path, "rb") as f:
         data = f.read()
-    decrypted = bytearray([b ^ key for b in data])
+    decrypted = bytearray()            
+    key = ord(password[0])             
+    for b in data:                   
+        decrypted_byte = b ^ key      
+        decrypted.append(decrypted_byte)
     orig_path = file_path[:-4]
     with open(orig_path, "wb") as f:
         f.write(decrypted)
-    print(f"Decrypted to: {orig_path}")
+    print(f"🔓Decrypted to: {orig_path}")
 
 # === Feature 7: Lock File (XOR + bcrypt) ===
 def lock_file(file_path, password):
-    key = ord(password[0])
-    password_bytes = password.encode("utf-8")
-    hashed_pw = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
-
     with open(file_path, "rb") as f:
         data = f.read()
 
-    encrypted = bytearray([b ^ key for b in data])
-    
-    enc_path = file_path + ".enc"
-    hash_path = file_path + ".hash"
+    key = password.encode() 
+    salt = bcrypt.gensalt()  
+    hash_key = bcrypt.hashpw(key, salt)  
+    print(hash_key)
+   
+    xor_key = hash_key[0]  
 
+    encrypted = bytearray()
+    for b in data:
+        encrypted_byte = b ^ xor_key
+        encrypted.append(encrypted_byte)
+
+    enc_path = file_path + ".hash"
     with open(enc_path, "wb") as f:
         f.write(encrypted)
-    with open(hash_path, "wb") as f:
-        f.write(hashed_pw)
 
     os.remove(file_path)
-    print(f" Locked: {enc_path}\n Hash saved: {hash_path}\n Original removed.")
+    print(f"🔒 Locked and removed original: {file_path}")
 # === Feature 8: Unlock File (XOR + bcrypt verification) ===
-def unlock_file(hash_file_path, password):
-    if not hash_file_path.endswith(".hash"):
-        raise ValueError("Input must be a '.hash' file.")
-
-    base_path = hash_file_path[:-5]  # removes .hash
-    enc_path = base_path + ".enc"
-    orig_path = base_path  # original file name to restore
-
-    if not os.path.exists(enc_path):
-        raise FileNotFoundError(f"Missing encrypted file: {enc_path}")
-
-    with open(hash_file_path, "rb") as f:
-        stored_hash = f.read()
-
-    if not bcrypt.checkpw(password.encode("utf-8"), stored_hash):
-        raise ValueError("❌ Incorrect password.")
-
-    with open(enc_path, "rb") as f:
+def unlock_file(file_path, password):
+    with open(file_path, "rb") as f:
         data = f.read()
 
-    key = ord(password[0])
-    decrypted = bytearray([b ^ key for b in data])
+    key = password.encode()
+    salt = bcrypt.gensalt()
+    hash_key = bcrypt.hashpw(key, salt)
 
-    with open(orig_path, "wb") as f:
+    xor_key = hash_key[0]  
+
+    decrypted = bytearray()
+    for b in data:
+        decrypted_byte = b ^ xor_key
+        decrypted.append(decrypted_byte)
+
+    original_path = file_path.replace(".hash", "")
+    with open(original_path, "wb") as f:
         f.write(decrypted)
 
-    print(f"🔓 Unlocked and restored: {orig_path}")
+    print(f"🔓 Unlocked and restored: {original_path}")
+
+
 
 
 #main fuction to run the app
