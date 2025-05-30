@@ -149,7 +149,23 @@ def convert_files(folder_path, choice=None):
     else:
         print("Invalid choice.")
 
-# === Feature 4: Detect and Handle Duplicate Files ===
+# === Feature 4: D# === Feature 4: Detect and Handle Duplicate Files ===
+def handle_duplicates(folder):
+    duplicates_folder = os.path.join(folder, "duplicates")
+    os.makedirs(duplicates_folder, exist_ok=True)
+    files_checked = []
+    duplicates = []
+
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        if os.path.isfile(file_path):
+            with open(file_path, "rb") as f:
+                content = f.read()
+            if any(content == saved for saved, _ in files_checked):
+                shutil.move(file_path, os.path.join(duplicates_folder, os.path.basename(file_path)))
+                print(f"Moved duplicate: {file_path}")
+            else:
+                files_checked.append((content, file_path))etect and Handle Duplicate Files ===
 # === Feature 5: Encrypt a File (XOR Encryption) ===
 # === Feature 6: Decrypt a File (XOR Decryption) ===
 # === Feature 7: Lock File (XOR + bcrypt) ===
