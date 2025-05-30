@@ -1,0 +1,3 @@
+Pillow
+docx2pdf
+bcrypt
