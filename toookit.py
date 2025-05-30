@@ -9,27 +9,31 @@ import bcrypt
 # === Feature 1: Batch Rename Files in a Folder ===
 def batch_rename_in_folder(folder, prefix):
     files = [] 
-    for item in os.listdir(folder):  
+    for item in os.listdir(folder): 
+        #to get the full length of the file location 
         full_path = os.path.join(folder, item) 
         if os.path.isfile(full_path):  
             files.append(full_path)
-    
+    # Loop through all files in the list, with a count starting from 1
+    #(enumerate does assign the list number and the name respectivly)
     for number, full_file_path in enumerate(files, 1):
 
         folder_of_file, original_file_name = os.path.split(full_file_path)
-
+    # Get the file extension (like ".txt", ".jpg") from the file name 
+    #from the last name it finds the . and at 1 is ext
         file_extension = os.path.splitext(original_file_name)[1]
 
         new_file_name = f"{prefix}_{number}{file_extension}"
 
         new_full_path = os.path.join(folder_of_file, new_file_name)
-
+        #renaming the oldfile by new one
         os.rename(full_file_path, new_full_path)
 
         print(f"Renamed😎😎😎: {original_file_name} -> {new_file_name}")
 
 # === Feature 2: Organize Files by Type ===
 def organize_files_by_type(folder_path):
+    # Map file extensions to folder names and there folder name
     file_type_folders = {
         "txt": "Text Files",
         "pdf": "PDFs",
@@ -59,13 +63,15 @@ def organize_files_by_type(folder_path):
         full_path = os.path.join(folder_path, file_name)
 
         if os.path.isfile(full_path):
+            # Split the filename into name and extension parts
             split_name_ext = os.path.splitext(file_name)
             extension_with_dot = split_name_ext[1]
 
             ext = extension_with_dot[1:].lower()
+            #example like README
             if not ext:
                 ext = "no_extension"
-            
+            #finds the name of folder to creat it from the dictionary
             folder_name = file_type_folders.get(ext, "Other Files")
 
             target_folder = os.path.join(folder_path, folder_name)
@@ -78,6 +84,7 @@ def organize_files_by_type(folder_path):
     print("Files organized successfully.😊😊😊")
 # === Feature 3: Convert File Extensions ===
 def convert_files(folder_path, choice=None):
+     # If choice is not provided, ask user
     if choice is None:
         print("Choose an option:")
         print("1. ------📒Convert images to a single PDF📒")
@@ -90,6 +97,8 @@ def convert_files(folder_path, choice=None):
 
     if choice == '1':
         supported_exts = ('.png', '.jpg', '.jpeg')
+        # List image files
+        #here we have basename
         image_files = []
         for f in os.listdir(folder_path):
             if f.lower().endswith(supported_exts):
@@ -98,19 +107,20 @@ def convert_files(folder_path, choice=None):
         if not image_files:
             print("No images found.")
             return
+             # Open and convert images to RGB the only way to generate pdf files 
         images=[]
         for img_path in image_files:
             img = Image.open(img_path)
             rgb_img = img.convert("RGB")
             images.append(rgb_img)
-
+        # Save as a single PDF
         output_pdf = os.path.join(folder_path, "combined_images.pdf")
         first_image=images[0]
         Other_images=images[1:]
         first_image.save(
-            output_pdf,          # File path to save the PDF
+            output_pdf,          
             save_all=True,       # Save all images, not just the first
-            append_images=Other_images  # Add the other images as extra pages
+            append_images=Other_images 
             )
         print(f"😎😎😎cmbined images into PDF: {output_pdf}")
 
@@ -119,6 +129,7 @@ def convert_files(folder_path, choice=None):
         output_folder = os.path.join(folder_path, "Converted_PDFs")
         os.makedirs(output_folder, exist_ok=True)
         doc_files = []
+        # Loop through all files in the folder
         for f in os.listdir(folder_path):
             filename_lower = f.lower()
             if filename_lower.endswith(supported_exts):
@@ -130,22 +141,31 @@ def convert_files(folder_path, choice=None):
             return
 
         for doc in doc_files:
-            name = os.path.splitext(os.path.basename(doc))[0]
-            output_pdf = os.path.join(output_folder, f"{name}.pdf")
+            file_name = os.path.basename(doc)
+            # Get the filename without its extension
+            #"." splits filename and 1 is number of splits and 0 index
+            file_name_without_ext = file_name.rsplit('.', 1)[0]
+
+            # Add the new '.pdf' extension
+            new_file_name = file_name_without_ext + '.pdf'
+
+            # Join the output folder path with the new filename to get the full output PDF path
+            output_pdf = os.path.join(output_folder, new_file_name)
+            
             convert(doc, output_pdf)
-            print(f"😎😎😎Converted: {doc} -> {output_pdf}")
+            print(f"Converted to PDF 😎😎😎")
     else:
         print("⚠️Invalid choice.")
 
 # === Feature 4: Detect and Handle Duplicate Files ===
 def handle_duplicates(folder):
     duplicates_folder = os.path.join(folder, "duplicates")
-    os.makedirs(duplicates_folder, exist_ok=True)  
+    os.makedirs(duplicates_folder, exist_ok=True)   # Create duplicates folder if not exists
     files_checked = []
     duplicates = []     
     for filename in os.listdir(folder):   
         file_path = os.path.join(folder, filename)
-
+        #checks whether it is file or not
         if os.path.isfile(file_path):     
             with open(file_path, "rb") as f:
                 content = f.read()         
@@ -171,7 +191,9 @@ def handle_duplicates(folder):
 def encrypt_file(file_path, password):
     with open(file_path, "rb") as f:
         data = f.read()
+    # Create an empty bytearray to store encrypted bytes
     encrypted = bytearray() 
+    # Get ASCII value of the first character of the password
     key = ord(password[0])
     for b in data:                         
         encrypted_byte = b ^ key             
@@ -191,9 +213,11 @@ def decrypt_file(file_path, password):
         data = f.read()
     decrypted = bytearray()            
     key = ord(password[0])             
-    for b in data:                   
+    for b in data:      
+        # XOR the byte with the key to decrypt it             
         decrypted_byte = b ^ key      
         decrypted.append(decrypted_byte)
+         # Remove ".enc"
     orig_path = file_path[:-4]
     with open(orig_path, "wb") as f:
         f.write(decrypted)
@@ -222,12 +246,12 @@ def unlock_file(file_path, password):
         file_data = f.read()
     salt = file_data[:8]
     encrypted = file_data[8:]
-    # Derive the same 1-byte key from password and salt
     key = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000, dklen=1)[0]
     decrypted = bytearray()
     for b in encrypted:
         decrypted.append(b ^ key)
-    orig_path = file_path[:-5]  # Remove ".lock"
+        # Remove ".lock"
+    orig_path = file_path[:-5]  
     with open(orig_path, "wb") as f:
         f.write(decrypted)
     print(f"🔓 Unlocked and restored: {orig_path}")
