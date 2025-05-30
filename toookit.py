@@ -108,7 +108,6 @@ def organize_files_by_type(folder_path):
             shutil.move(full_path, os.path.join(target_folder, file_name))
 
     print("Files organized successfully.")
-# === Feature 2: Organize Files by Type ===
 # === Feature 3: Convert File Extensions ===
 def convert_files(folder_path, choice=None):
     if choice is None:
@@ -149,7 +148,7 @@ def convert_files(folder_path, choice=None):
     else:
         print("Invalid choice.")
 
-# === Feature 4: D# === Feature 4: Detect and Handle Duplicate Files ===
+# === Feature 4: Detect and Handle Duplicate Files ===
 def handle_duplicates(folder):
     duplicates_folder = os.path.join(folder, "duplicates")
     os.makedirs(duplicates_folder, exist_ok=True)
