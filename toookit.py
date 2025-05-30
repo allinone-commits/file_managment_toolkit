@@ -54,3 +54,14 @@ if __name__ == "__main__":
             print("❌ Invalid choice.")
     except Exception as e:
         print(f"Error: {e}")
+
+
+
+# === Feature 1: Batch Rename Files in a Folder ===
+# === Feature 2: Organize Files by Type ===
+# === Feature 3: Convert File Extensions ===
+# === Feature 4: Detect and Handle Duplicate Files ===
+# === Feature 5: Encrypt a File (XOR Encryption) ===
+# === Feature 6: Decrypt a File (XOR Decryption) ===
+# === Feature 7: Lock File (XOR + bcrypt) ===
+# === Feature 8: Unlock File (XOR + bcrypt verification) ===
