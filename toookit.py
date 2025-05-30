@@ -1,3 +1,10 @@
+import os
+import hashlib
+import shutil
+from PIL import Image
+from docx2pdf import convert
+import bcrypt
+
 # === Feature 1: Batch Rename Files in a Folder ===
 def batch_rename_in_folder(folder, prefix):
     files = [os.path.join(folder, item) for item in os.listdir(folder) if os.path.isfile(os.path.join(folder, item))]
