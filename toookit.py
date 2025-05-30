@@ -10,9 +10,9 @@ import bcrypt
 def batch_rename_in_folder(folder, prefix):
     files = [] 
     for item in os.listdir(folder):  
-    full_path = os.path.join(folder, item) 
-    if os.path.isfile(full_path):  
-        files.append(full_path)
+        full_path = os.path.join(folder, item) 
+        if os.path.isfile(full_path):  
+            files.append(full_path)
     
     for number, full_file_path in enumerate(files, 1):
 
@@ -73,7 +73,7 @@ def organize_files_by_type(folder_path):
             os.makedirs(target_folder, exist_ok=True)
 
             new_location_file = os.path.join(target_folder, file_name)
-            shutil.move(full_path, new_location)
+            shutil.move(full_path, new_location_file)
 
     print("Files organized successfully.😊😊😊")
 # === Feature 3: Convert File Extensions ===
@@ -91,7 +91,7 @@ def convert_files(folder_path, choice=None):
     if choice == '1':
         supported_exts = ('.png', '.jpg', '.jpeg')
         image_files = []
-         for f in os.listdir(folder_path):
+        for f in os.listdir(folder_path):
             if f.lower().endswith(supported_exts):
                 image_files.append(os.path.join(folder_path, f))
         image_files.sort()
@@ -100,17 +100,17 @@ def convert_files(folder_path, choice=None):
             return
         images=[]
         for img_path in image_files:
-        img = Image.open(img_path)
-        rgb_img = img.convert("RGB")
-        images.append(rgb_img)
+            img = Image.open(img_path)
+            rgb_img = img.convert("RGB")
+            images.append(rgb_img)
 
         output_pdf = os.path.join(folder_path, "combined_images.pdf")
-        first_image=images[0]:
-        Other_image=images[1:]
+        first_image=images[0]
+        Other_images=images[1:]
         first_image.save(
             output_pdf,          # File path to save the PDF
             save_all=True,       # Save all images, not just the first
-            append_images=other_images  # Add the other images as extra pages
+            append_images=Other_images  # Add the other images as extra pages
             )
         print(f"😎😎😎cmbined images into PDF: {output_pdf}")
 
@@ -121,7 +121,7 @@ def convert_files(folder_path, choice=None):
         doc_files = []
         for f in os.listdir(folder_path):
             filename_lower = f.lower()
-        if filename_lower.endswith(supported_exts):
+            if filename_lower.endswith(supported_exts):
                 # Create the full path of the file and add it to the list
                 full_path = os.path.join(folder_path, f)
                 doc_files.append(full_path)
@@ -141,6 +141,7 @@ def convert_files(folder_path, choice=None):
 def handle_duplicates(folder):
     duplicates_folder = os.path.join(folder, "duplicates")
     os.makedirs(duplicates_folder, exist_ok=True)  
+    files_checked = []
     duplicates = []     
     for filename in os.listdir(folder):   
         file_path = os.path.join(folder, filename)
@@ -173,8 +174,8 @@ def encrypt_file(file_path, password):
     encrypted = bytearray() 
     key = ord(password[0])
     for b in data:                         
-    encrypted_byte = b ^ key             
-    encrypted.append(encrypted_byte)
+        encrypted_byte = b ^ key             
+        encrypted.append(encrypted_byte)
     enc_path = file_path + ".enc"
     with open(enc_path, "wb") as f:
         f.write(encrypted)
@@ -201,47 +202,35 @@ def decrypt_file(file_path, password):
 # === Feature 7: Lock File (XOR + bcrypt) ===
 def lock_file(file_path, password):
     with open(file_path, "rb") as f:
-        data = f.read()
-
-    key = password.encode() 
-    salt = bcrypt.gensalt()  
-    hash_key = bcrypt.hashpw(key, salt)  
-    print(hash_key)
-   
-    xor_key = hash_key[0]  
-
+        data = f.read()    
+    salt = os.urandom(8)
+    # Derive a 1-byte key from PBKDF2 (using SHA256)
+    key = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000, dklen=1)[0]
     encrypted = bytearray()
     for b in data:
-        encrypted_byte = b ^ xor_key
-        encrypted.append(encrypted_byte)
-
-    enc_path = file_path + ".hash"
+        encrypted.append(b ^ key)
+    enc_path = file_path + ".lock"
     with open(enc_path, "wb") as f:
-        f.write(encrypted)
-
+        f.write(salt + encrypted)
     os.remove(file_path)
     print(f"🔒 Locked and removed original: {file_path}")
 # === Feature 8: Unlock File (XOR + bcrypt verification) ===
 def unlock_file(file_path, password):
+    if not file_path.endswith(".lock"):
+        raise ValueError("File must end with '.lock'")
     with open(file_path, "rb") as f:
-        data = f.read()
-
-    key = password.encode()
-    salt = bcrypt.gensalt()
-    hash_key = bcrypt.hashpw(key, salt)
-
-    xor_key = hash_key[0]  
-
+        file_data = f.read()
+    salt = file_data[:8]
+    encrypted = file_data[8:]
+    # Derive the same 1-byte key from password and salt
+    key = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000, dklen=1)[0]
     decrypted = bytearray()
-    for b in data:
-        decrypted_byte = b ^ xor_key
-        decrypted.append(decrypted_byte)
-
-    original_path = file_path.replace(".hash", "")
-    with open(original_path, "wb") as f:
+    for b in encrypted:
+        decrypted.append(b ^ key)
+    orig_path = file_path[:-5]  # Remove ".lock"
+    with open(orig_path, "wb") as f:
         f.write(decrypted)
-
-    print(f"🔓 Unlocked and restored: {original_path}")
+    print(f"🔓 Unlocked and restored: {orig_path}")
 
 
 
@@ -263,44 +252,44 @@ if __name__ == "__main__":
 
     try:
         if choice == '1':
-            print("--------wellcome to batch renaming-------------")
+            print("--------welcome to batch renaming-------------")
             folder = input("Enter folder path:>>>> ").strip()
             prefix = input("Enter file name prefix: ")
             batch_rename_in_folder(folder, prefix)
         elif choice == '2':
-            print("--------wellcome to file organization-------------")
+            print("--------welcome to file organization-------------")
             folder = input("Enter folder path:>>>> ").strip()
             organize_files_by_type(folder)
         elif choice == '3':
-            print("--------wellcome to file extension tool-------------")
+            print("--------welcome to file extension tool-------------")
             file = input("Enter file: ").strip()
             convert_files(file)
         elif choice == '4':
-            print("--------wellcome to file duplicate finder-------------")
+            print("--------welcome to file duplicate finder-------------")
             folder = input("Enter folder path:>>>> ").strip()
             handle_duplicates(folder)
         elif choice == '5':
-            print("--------wellcome to file encripter finder-------------")
+            print("--------welcome to file encryptor-------------")
             file = input("Enter file path >>>>: ").strip()
             password = input("Enter encryption password: ")
             encrypt_file(file, password)
         elif choice == '6':
-            print("--------wellcome to file depricter -------------")
+            print("--------welcome to file decrypter -------------")
             file = input("Enter file path>>>: ").strip()
             password = input("Enter decryption password: ")
             decrypt_file(file, password)
         elif choice == '7':
-            print("--------wellcome to file locker -------------")
+            print("--------welcome to file locker -------------")
             file = input("Enter file path ").strip()
             password = input("Enter lock password: ")
             lock_file(file, password)
         elif choice == '8':
-            print("--------wellcome to file unloacker -------------")
+            print("--------welcome to file unlocker -------------")
             file = input("Enter file path ").strip()
             password = input("Enter unlock password: ")
             unlock_file(file, password)
         else:
-            print("❌ Invalid choice.")
+            print("⚠️Invalid choice.")
     except Exception as e:
         print(f"Error: {e}")
 
