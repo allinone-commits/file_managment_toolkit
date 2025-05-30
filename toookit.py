@@ -170,3 +170,24 @@ def handle_duplicates(folder):
 # === Feature 6: Decrypt a File (XOR Decryption) ===
 # === Feature 7: Lock File (XOR + bcrypt) ===
 # === Feature 8: Unlock File (XOR + bcrypt verification) ===
+
+def lock_file(file_path, password):
+    key = ord(password[0])
+    password_bytes = password.encode("utf-8")
+    hashed_pw = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+
+    with open(file_path, "rb") as f:
+        data = f.read()
+
+    encrypted = bytearray([b ^ key for b in data])
+    
+    enc_path = file_path + ".enc"
+    hash_path = file_path + ".hash"
+
+    with open(enc_path, "wb") as f:
+        f.write(encrypted)
+    with open(hash_path, "wb") as f:
+        f.write(hashed_pw)
+
+    os.remove(file_path)
+    print(f" Locked: {enc_path}\n Hash saved: {hash_path}\n Original removed.")
