@@ -4,6 +4,8 @@ import hashlib
 import shutil
 from PIL import Image
 from docx2pdf import convert
+from pdf2docx import Converter
+
 import bcrypt
 
 # === Feature 1: Batch Rename Files in a Folder ===
@@ -89,7 +91,8 @@ def convert_files(folder_path, choice=None):
         print("Choose an option:")
         print("1. ------📒Convert images to a single PDF📒")
         print("2.-------📒 Convert documents (doc, docx) to individual PDFs📒")
-        choice = input("Enter 1 or 2:>>>>> ").strip()
+        print("3.-------📒 Convert pdfs  to individual doc📒")
+        choice = input("Enter 1 or 2 or 3:>>>>> ").strip()
 
     if not os.path.isdir(folder_path):
         print(" Invalid folder path.")
@@ -154,6 +157,37 @@ def convert_files(folder_path, choice=None):
             
             convert(doc, output_pdf)
             print(f"Converted to PDF 😎😎😎")
+    elif choice == '3':
+    supported_exts = ('.pdf',)
+    output_folder = os.path.join(folder_path, "Converted_DOCs")
+    os.makedirs(output_folder, exist_ok=True)
+    pdf_files = []
+
+    for f in os.listdir(folder_path):
+        filename_lower = f.lower()
+        if filename_lower.endswith(supported_exts):
+            full_path = os.path.join(folder_path, f)
+            pdf_files.append(full_path)
+
+    if not pdf_files:
+        print("No PDF files found.")
+        return
+
+    for pdf in pdf_files:
+        file_name = os.path.basename(pdf)
+        file_name_without_ext = file_name.rsplit('.', 1)[0]
+        new_file_name = file_name_without_ext + '.docx'
+        output_doc = os.path.join(output_folder, new_file_name)
+
+        # Convert PDF to DOCX
+        try:
+            cv = Converter(pdf)
+            cv.convert(output_doc, start=0, end=None)
+            cv.close()
+            print(f"Converted {file_name} to DOCX 😎😎😎")
+        except Exception as e:
+            print(f"Failed to convert {file_name}: {e}")
+
     else:
         print("⚠️Invalid choice.")
 
