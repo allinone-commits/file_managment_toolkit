@@ -132,7 +132,7 @@ def convert_files(folder_path, choice=None):
                 save_all=True,       # Save all images, not just the first
                 append_images=Other_images 
                 )
-            print(f">>>>cmbined images into PDF: {output_pdf}")
+            print(f">>>>combined images into PDF: {output_pdf}")
 
         elif choice == '2':
             supported_exts = ('.doc', '.docx')
@@ -348,7 +348,7 @@ if __name__ == "__main__":
             organize_files_by_type(folder)
         elif choice == '3':
             print("--------welcome to file extension tool-------------")
-            file = input("Enter file: ").strip()
+            file = input("Enter folder path>>>>: ").strip()
             convert_files(file)
         elif choice == '4':
             print("--------welcome to file duplicate finder-------------")
@@ -371,7 +371,7 @@ if __name__ == "__main__":
             lock_file(file, password)
         elif choice == '8':
             print("--------welcome to file unlocker -------------")
-            file = input("Enter file path ").strip()
+            file = input("Enter file path>>>>>>:  ").strip()
             password = input("Enter unlock password: ")
             unlock_file(file, password)
         elif choice == '9':
