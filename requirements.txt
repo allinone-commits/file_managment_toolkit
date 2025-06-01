@@ -1,4 +1,3 @@
 Pillow
 docx2pdf
-bcrypt
 pdf2docx
