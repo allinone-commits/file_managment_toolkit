@@ -6,8 +6,6 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, trim: true, unique: true, sparse: true },
   password: { type: String, required: true },
   isAdmin: { type: Boolean, default: false },
-  emailVerified: { type: Boolean, default: false },
-  verificationCode: { type: String },
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Destination" }],
   createdAt: { type: Date, default: Date.now },
 });

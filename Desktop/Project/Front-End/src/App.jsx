@@ -8,7 +8,6 @@ import Dashboard from "./Dashboard.jsx";
 import Home from "./Home.jsx";
 import DestinationDetail from "./DestinationDetail.jsx";
 import AddDestination from "./AddDestination.jsx";
-import VerifyEmail from "./VerifyEmail.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
@@ -106,7 +105,6 @@ function App() {
           path="/signup"
           element={user ? <Navigate to="/dashboard" /> : <Signup />}
         />
-        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/destinations/:id" element={<DestinationDetail user={user} />} />
         <Route
           path="/dashboard"

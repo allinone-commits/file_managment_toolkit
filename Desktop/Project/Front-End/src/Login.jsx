@@ -38,9 +38,6 @@ export default function Login({ onLogin }) {
       <div className="mt-3">
         New user? <Link to="/signup">Create account</Link>
       </div>
-      <div className="mt-1">
-        Verify email? <Link to="/verify-email">Verify here</Link>
-      </div>
     </Container>
   );
 }

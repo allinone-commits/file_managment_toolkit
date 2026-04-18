@@ -14,7 +14,7 @@ export default function Signup() {
       const response = await api.post("/auth/signup", form);
       setMessage(response.data.message);
       setError(null);
-      setTimeout(() => navigate("/verify-email"), 1200);
+      setTimeout(() => navigate("/login"), 1200);
     } catch (err) {
       setError(err?.response?.data?.error || "Signup failed.");
       setMessage(null);
