@@ -10,12 +10,15 @@ export default function Login({ onLogin }) {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    console.log("Login button clicked", { identifier, password });
     try {
       const response = await api.post("/auth/login", { identifier, password });
+      console.log("Login response:", response.data);
       localStorage.setItem("token", response.data.token);
       onLogin(response.data.user);
       navigate("/dashboard");
     } catch (err) {
+      console.error("Login error:", err);
       setError(err?.response?.data?.error || "Login failed.");
     }
   };
@@ -33,7 +36,7 @@ export default function Login({ onLogin }) {
           <Form.Label>Password</Form.Label>
           <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </Form.Group>
-        <Button onClick={handleLogin}>Login</Button>
+        <Button type="button" onClick={handleLogin}>Login</Button>
       </Form>
       <div className="mt-3">
         New user? <Link to="/signup">Create account</Link>
